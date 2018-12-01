@@ -4,7 +4,9 @@
 #Description: Finding a number after applying a list of numbers
 #Arguments: 0
 
-args = """-12
+import itertools
+
+input_text = """-12
 -6
 -12
 +1
@@ -982,21 +984,38 @@ args = """-12
 -33
 -71491"""
 
-args = args.split("\n")
+input_text = input_text.split("\n")
+args = input_text
+for i in range(len(args)):
+    args[i] = int(args[i])
+print("Answer to part 1 is: " + str(sum(args)))
 value = 0
-list_of_freq = []
-last_freq = 0
-time = 0
+set_of_freq = set([0])
+time = 1
 condition = True
 while condition:
-    print(str(time) + " value: " + str(value))
+    print(str(time))
     for i in args:
-        i = int(i)
-        value += i
-        if value in list_of_freq:
+        value += int(i)
+        if value in set_of_freq:
             condition = False
             break
-        list_of_freq.append(value)
+        set_of_freq.add(value)
     time += 1
 
 print(value)
+
+#Updated code. Should be much faster using list comprehension and itertools
+#Did some copying of this code, trying to learn.
+numbers = [int(x) for x in input_text]
+print("Answer to part 1 is: " + str(sum(numbers)))
+
+value = 0
+set_of_frequencies = set([0])
+for i in itertools.cycle(numbers):
+    value += i
+    if value in set_of_frequencies:
+        break
+    set_of_frequencies.add(value)
+
+print("Answer to part 2 is: " + str(value))
