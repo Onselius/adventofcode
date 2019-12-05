@@ -16,7 +16,7 @@ public class dec02 {
                     commands = old.clone();
                     commands[1] = value1;
                     commands[2] = value2;
-                    if (checkForValue(commands) == 19690720){
+                    if (intcodeComputer(commands) == 19690720){
                         System.out.println("Value 1: " + value1);
                         System.out.println("Value 2: " + value2);
                         System.out.println("100 * value1 + value2: " + (100 * value1 + value2));
@@ -24,16 +24,11 @@ public class dec02 {
                     }
                 }
             }
-
-//            for (int i = 0; i < commands.length; i++){
-//                System.out.print(commands[i] + " | " + old[i]);
-//                System.out.println("");
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public static int checkForValue(int[] testArray){
+    public static int intcodeComputer(int[] testArray){
         for (int i = 0; i < testArray.length; i += 4){
             int command = testArray[i];
             if (command == 99){
