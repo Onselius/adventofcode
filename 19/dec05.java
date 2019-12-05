@@ -43,8 +43,16 @@ class IntcodeComputer{
                 instruction2(command);
             } else if (command.endsWith("3")){
                 instruction3(command);
-            } else if (command.endsWith("4")){
+            } else if (command.endsWith("4")) {
                 instruction4(command);
+            } else if (command.endsWith("5")){
+                instruction5(command);
+            } else if (command.endsWith("6")) {
+                instruction6(command);
+            } else if (command.endsWith("7")){
+                instruction7(command);
+            } else if (command.endsWith("8")) {
+                instruction8(command);
             } else {
                 System.out.println("Invalid input, terminating");
                 System.out.println("Index is " + this.index);
@@ -53,7 +61,7 @@ class IntcodeComputer{
             }
         }
     }
-    public ArrayList<String> populateParameters(String command){
+    private ArrayList<String> populateParameters(String command){
 //        System.out.println("populating parameters");
         ArrayList<String> parameters = new ArrayList<>();
         int length;
@@ -68,7 +76,7 @@ class IntcodeComputer{
         return parameters;
     }
 
-    public ArrayList<Integer> populateValues(ArrayList<String> parameters){
+    private ArrayList<Integer> populateValues(ArrayList<String> parameters){
 //        System.out.println("populating values");
         ArrayList<Integer> values = new ArrayList<>(parameters.size());
 //        System.out.println(parameters);
@@ -83,7 +91,7 @@ class IntcodeComputer{
         return values;
     }
 
-    public void instruction1(String command){
+    private void instruction1(String command){
         ArrayList<String> parameters = populateParameters(command);
         ArrayList<Integer> values = populateValues(parameters);
         int pos = this.instructions[this.index];
@@ -95,7 +103,7 @@ class IntcodeComputer{
         System.out.println("Writing " + sum + " to position " + pos);
         this.index++; //Index is now on next instruction
     }
-    public void instruction2(String command){
+    private void instruction2(String command){
         ArrayList<String> parameters = populateParameters(command);
         ArrayList<Integer> values = populateValues(parameters);
         int pos = this.instructions[this.index];
@@ -107,7 +115,7 @@ class IntcodeComputer{
         System.out.println("Writing " + sum + " to position " + pos);
         this.index++;
     }
-    public void instruction3(String command){
+    private void instruction3(String command){
         System.out.print("Enter input: ");
         String input = this.reader.nextLine();
         this.index++;
@@ -116,7 +124,7 @@ class IntcodeComputer{
         System.out.println("Writing " + input + " to position " + pos);
         this.index++;
     }
-    public void instruction4(String command){
+    private void instruction4(String command){
         ArrayList<String> parameters = populateParameters(command);
         int output;
         if (parameters.get(0).equals("0")){
@@ -126,6 +134,44 @@ class IntcodeComputer{
         }
         System.out.println("index is " + this.index);
         System.out.println("Output is: " + output);
+        this.index++;
+    }
+    private void instruction5(String command){
+        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<Integer> values = populateValues(parameters);
+        if (values.get(0) != 0){
+            this.index = values.get(1);
+        }
+    }
+    private void instruction6(String command){
+        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<Integer> values = populateValues(parameters);
+        if (values.get(0) == 0){
+            this.index = values.get(1);
+        }
+    }
+    private void instruction7(String command){
+        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<Integer> values = populateValues(parameters);
+        int pos = this.instructions[this.index];
+        int value = 0;
+        if (values.get(0) < values.get(1)){
+            value = 1;
+        }
+        this.instructions[pos] = value;
+        System.out.println("Writing " + value + " to position " + pos);
+        this.index++;
+    }
+    private void instruction8(String command){
+        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<Integer> values = populateValues(parameters);
+        int pos = this.instructions[this.index];
+        int value = 0;
+        if (values.get(0).equals(values.get(1))){
+            value = 1;
+        }
+        this.instructions[pos] = value;
+        System.out.println("Writing " + value + " to position " + pos);
         this.index++;
     }
 
