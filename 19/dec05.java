@@ -24,40 +24,45 @@ class IntcodeComputer{
     private int[] instructions;
     private int index;
     private Scanner reader;
-    private ArrayList<Integer> inputOutputList;
+    public ArrayList<Integer> inputList;
+    public ArrayList<Integer> outputList;
 
     public IntcodeComputer(int[] instructions) {
         this.instructions = instructions;
         this.index = 0;
         this.reader = new Scanner(System.in);
-        this.inputOutputList = new ArrayList<>(1);
+        this.inputList = new ArrayList<>(2);
+        this.outputList = new ArrayList<>(1);
     }
 
     public void setInput(Integer input){
-        this.inputOutputList.add(input);
+        this.inputList.add(input);
     }
     public int getOutput(){
-        if (this.inputOutputList.size() > 0){
-            return this.inputOutputList.get(0);
+        if (this.outputList.size() > 0){
+            return this.outputList.get(0);
         }
         return -666;
     }
 
-    public void run(){
+    public int run(){
         String command;
         while(true){
             command = String.valueOf(this.instructions[this.index]);
             if (command.endsWith("99")){
                 System.out.println("Exited because of input 99");
-                break;
+                return 99;
             } else if (command.endsWith("1")){
                 instruction1(command);
             } else if (command.endsWith("2")){
                 instruction2(command);
             } else if (command.endsWith("3")){
-                instruction3(command);
+                if (!instruction3(command)){
+                   break;
+                }
             } else if (command.endsWith("4")) {
                 instruction4(command);
+                break;
             } else if (command.endsWith("5")){
                 instruction5(command);
             } else if (command.endsWith("6")) {
@@ -73,6 +78,7 @@ class IntcodeComputer{
                 break;
             }
         }
+        return -1;
     }
     private ArrayList<String> populateParameters(String command){
         ArrayList<String> parameters = new ArrayList<>();
@@ -110,7 +116,7 @@ class IntcodeComputer{
             sum += number;
         }
         this.instructions[pos] = sum;
-        System.out.println("Writing " + sum + " to position " + pos);
+//        System.out.println("Writing " + sum + " to position " + pos);
         this.index++; //Index is now on next instruction
     }
     private void instruction2(String command){
@@ -122,22 +128,27 @@ class IntcodeComputer{
             sum *= number;
         }
         this.instructions[pos] = sum;
-        System.out.println("Writing " + sum + " to position " + pos);
+//        System.out.println("Writing " + sum + " to position " + pos);
         this.index++;
     }
-    private void instruction3(String command){
+    private boolean instruction3(String command){
         Integer input;
-        if (this.inputOutputList.isEmpty()){
-            System.out.print("Enter input: ");
-            input = Integer.parseInt(this.reader.nextLine());
+        if (this.inputList.isEmpty()){
+            return false;
+//            System.out.print("Enter input: ");
+//            input = Integer.parseInt(this.reader.nextLine());
         } else {
-            input = this.inputOutputList.get(0);
+            input = this.inputList.get(0);
+            this.inputList.remove(0);
         }
+//        System.out.println("index for input is: " + this.index);
         this.index++;
         int pos = this.instructions[this.index];
         this.instructions[pos] = input;
-        System.out.println("Writing " + input + " to position " + pos);
+//        System.out.println("Writing " + input + " to position " + pos);
+//        System.out.println("Size of inputlist is " + this.inputList.size());
         this.index++;
+        return true;
     }
     private void instruction4(String command){
         ArrayList<String> parameters = populateParameters(command);
@@ -147,9 +158,9 @@ class IntcodeComputer{
         } else {
             output = this.instructions[this.index];
         }
-        System.out.println("index is " + this.index);
-        System.out.println("Output is: " + output);
-        this.inputOutputList.add(output);
+//        System.out.println("index is " + this.index);
+//        System.out.println("Output is: " + output);
+        this.outputList.add(0,output);
         this.index++;
     }
     private void instruction5(String command){
@@ -175,7 +186,7 @@ class IntcodeComputer{
             value = 1;
         }
         this.instructions[pos] = value;
-        System.out.println("Writing " + value + " to position " + pos);
+//        System.out.println("Writing " + value + " to position " + pos);
         this.index++;
     }
     private void instruction8(String command){
@@ -187,7 +198,7 @@ class IntcodeComputer{
             value = 1;
         }
         this.instructions[pos] = value;
-        System.out.println("Writing " + value + " to position " + pos);
+//        System.out.println("Writing " + value + " to position " + pos);
         this.index++;
     }
 
