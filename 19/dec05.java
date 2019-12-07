@@ -24,12 +24,25 @@ class IntcodeComputer{
     private int[] instructions;
     private int index;
     private Scanner reader;
+    private ArrayList<Integer> inputOutputList;
 
     public IntcodeComputer(int[] instructions) {
         this.instructions = instructions;
         this.index = 0;
         this.reader = new Scanner(System.in);
+        this.inputOutputList = new ArrayList<>(1);
     }
+
+    public void setInput(Integer input){
+        this.inputOutputList.add(input);
+    }
+    public int getOutput(){
+        if (this.inputOutputList.size() > 0){
+            return this.inputOutputList.get(0);
+        }
+        return -666;
+    }
+
     public void run(){
         String command;
         while(true){
@@ -62,7 +75,6 @@ class IntcodeComputer{
         }
     }
     private ArrayList<String> populateParameters(String command){
-//        System.out.println("populating parameters");
         ArrayList<String> parameters = new ArrayList<>();
         int length;
         for (int i = command.length() - 3; i >= 0; i--){
@@ -77,9 +89,7 @@ class IntcodeComputer{
     }
 
     private ArrayList<Integer> populateValues(ArrayList<String> parameters){
-//        System.out.println("populating values");
         ArrayList<Integer> values = new ArrayList<>(parameters.size());
-//        System.out.println(parameters);
         for (String parameter : parameters) {
             if (parameter.equals("0")) {
                 values.add(this.instructions[this.instructions[this.index]]);
@@ -116,11 +126,16 @@ class IntcodeComputer{
         this.index++;
     }
     private void instruction3(String command){
-        System.out.print("Enter input: ");
-        String input = this.reader.nextLine();
+        Integer input;
+        if (this.inputOutputList.isEmpty()){
+            System.out.print("Enter input: ");
+            input = Integer.parseInt(this.reader.nextLine());
+        } else {
+            input = this.inputOutputList.get(0);
+        }
         this.index++;
         int pos = this.instructions[this.index];
-        this.instructions[pos] = Integer.parseInt(input);
+        this.instructions[pos] = input;
         System.out.println("Writing " + input + " to position " + pos);
         this.index++;
     }
@@ -134,6 +149,7 @@ class IntcodeComputer{
         }
         System.out.println("index is " + this.index);
         System.out.println("Output is: " + output);
+        this.inputOutputList.add(output);
         this.index++;
     }
     private void instruction5(String command){
