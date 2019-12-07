@@ -38,24 +38,6 @@ public class dec07 {
                 input = 0;
             }
             calculateMax(signals);
-
-
-/* Part 1 solution below
-            permutations("", part2, permutations);
-            for (String seq: permutations) {
-                int exitCode = 0;
-                for (int i = 0; i < seq.length(); i++) {
-                    IntcodeComputer computer = new IntcodeComputer(instructions.clone());
-                    computer.setInput(Integer.parseInt(String.valueOf(seq.charAt(i))));
-                    computer.setInput(input);
-                    computer.run();
-                    input = computer.getOutput();
-                }
-                signals.put(seq, input);
-                input = 0;
-            }
-            calculateMax(signals);
- */
         } catch (IOException e) {
             e.printStackTrace();
         }
