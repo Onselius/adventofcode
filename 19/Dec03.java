@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class dec03 {
+public class Dec03 {
     public static void main(String[] args) {
         try {
             File input = new File("19/input03.txt");

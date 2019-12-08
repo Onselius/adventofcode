@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class dec04 {
+public class Dec04 {
     public static void main(String[] args) {
         ArrayList<String> passwords = new ArrayList<>();
         int numberOfPasswords = 0;

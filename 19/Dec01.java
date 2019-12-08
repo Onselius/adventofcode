@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class dec01 {
+public class Dec01 {
 
     public static void main(String[] args) {
         try {

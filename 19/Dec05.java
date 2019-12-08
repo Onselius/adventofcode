@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class dec05 {
+public class Dec05 {
     public static void main(String[] args) {
         File input = new File("19/input05.txt");
         try {

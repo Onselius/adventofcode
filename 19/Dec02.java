@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.Arrays;
 
-public class dec02 {
+public class Dec02 {
 
     public static void main(String[] args) {
         try {

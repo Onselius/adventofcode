@@ -2,13 +2,13 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class dec06 {
+public class Dec06 {
     private HashMap<String, Integer> orbits;
     HashSet<String[]> input;
     HashSet<String[]> originalInput;
     HashSet<String> myWayToSanta;
     public static void main(String[] args) {
-        dec06 calculator = new dec06();
+        Dec06 calculator = new Dec06();
         calculator.run();
     }
     public void run(){
@@ -45,7 +45,7 @@ public class dec06 {
         System.out.println("Steps for me to Santa: " + (orbitsForMe + orbitsForSanta));
     }
 
-    public dec06() {
+    public Dec06() {
         this.orbits = new HashMap<>();
         this.input = new HashSet<>();
         this.myWayToSanta = new HashSet<>();

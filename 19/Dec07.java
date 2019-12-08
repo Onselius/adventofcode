@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class dec07 {
+public class Dec07 {
     public static void main(String[] args) {
         File file = new File("19/input07.txt");
         int input = 0;
