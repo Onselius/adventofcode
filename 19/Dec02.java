@@ -1,11 +1,12 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class Dec02 {
 
     public static void main(String[] args) {
         try {
-            File input = new File("input02.txt");
+            File input = new File("19/input02.txt");
             BufferedReader reader = new BufferedReader(new FileReader(input));
             String baseString = reader.readLine();
             int[] commands = Arrays.stream(baseString.split(",")).mapToInt(Integer::parseInt).toArray();
@@ -24,6 +25,27 @@ public class Dec02 {
                     }
                 }
             }
+            long[] commando;
+            HashSet<Long> testSet = new HashSet<>();
+            outerloop:
+            for (int value1 = 0; value1 < 100; value1++){
+                for (int value2 = 0; value2 < 100; value2++){
+                    commando = Arrays.stream(old).asLongStream().toArray();
+                    commando[1] = value1;
+                    commando[2] = value2;
+                    IntcodeComputer computer = new IntcodeComputer(commando);
+                    computer.run();
+                    long exitCode = computer.getExitCode();
+                    testSet.add(exitCode);
+                    if (exitCode == 19690720L){
+                        System.out.println("Value 1: " + value1);
+                        System.out.println("Value 2: " + value2);
+                        System.out.println("100 * value1 + value2: " + (100 * value1 + value2));
+                        break outerloop;
+                    }
+                }
+            }
+            System.out.println(testSet.contains(19690720L));
         } catch (IOException e) {
             e.printStackTrace();
         }

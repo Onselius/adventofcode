@@ -6,15 +6,15 @@ import java.util.HashMap;
 public class Dec07 {
     public static void main(String[] args) {
         File file = new File("19/input07.txt");
-        int input = 0;
+        long input = 0L;
         String part1 = "01234";
         String part2 = "56789";
-        HashMap<String, Integer> signals = new HashMap<>();
+        HashMap<String, Long> signals = new HashMap<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String baseString = reader.readLine();
             ArrayList<String> permutations = new ArrayList<>();
-            int[] instructions = Arrays.stream(baseString.split(",")).mapToInt(Integer::parseInt).toArray();
+            long[] instructions = Arrays.stream(baseString.split(",")).mapToLong(Integer::parseInt).toArray();
 
             permutations("", part2, permutations);
             for (String seq: permutations) {
@@ -42,9 +42,9 @@ public class Dec07 {
             e.printStackTrace();
         }
     }
-    private static void calculateMax(HashMap<String, Integer> signals){
+    private static void calculateMax(HashMap<String, Long> signals){
         String signal = "";
-        int highest = 0;
+        Long highest = 0L;
         for (String seq : signals.keySet()){
             if (signals.get(seq) > highest){
                 signal = seq;
