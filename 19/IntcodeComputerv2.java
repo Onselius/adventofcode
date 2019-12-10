@@ -64,7 +64,15 @@ public class IntcodeComputerv2 {
                     this.memory.put(getValue(1), input);
                     break;
                 case 4:
-                    this.outputs.add(getValue(0));
+                    this.outputs.add(getValue(paramMode1));
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    break;
+                case 8:
                     break;
             }
         }
