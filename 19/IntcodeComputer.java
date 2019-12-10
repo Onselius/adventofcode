@@ -87,13 +87,17 @@ public class IntcodeComputer {
     private ArrayList<Long> populateValues(ArrayList<String> parameters) {
         ArrayList<Long> values = new ArrayList<>(parameters.size());
         for (String parameter : parameters) {
-            if (parameter.equals("0")) {
-                values.add(this.instructions[Math.toIntExact(this.instructions[this.index])]);
-            } else if (parameter.equals("1")) {
-                values.add(this.instructions[this.index]);
-            } else if (parameter.equals("2")) {
-                int valueIndex = (int) (this.relativeIndex + this.instructions[this.index]);
-                values.add(this.instructions[valueIndex]);
+            switch (parameter) {
+                case "0":
+                    values.add(this.instructions[Math.toIntExact(this.instructions[this.index])]);
+                    break;
+                case "1":
+                    values.add(this.instructions[this.index]);
+                    break;
+                case "2":
+                    int valueIndex = (int) (this.relativeIndex + this.instructions[this.index]);
+                    values.add(this.instructions[valueIndex]);
+                    break;
             }
             this.index++;
         }
