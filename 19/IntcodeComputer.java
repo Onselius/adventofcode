@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class IntcodeComputer {
@@ -32,6 +33,8 @@ public class IntcodeComputer {
     public int run() {
         String command;
         while (true) {
+            System.out.println("index: " + this.index);
+            System.out.println("relative. " + this.relativeIndex);
             command = String.valueOf(this.instructions[this.index]);
             if (command.endsWith("99")) {
                 System.out.println("Exited because of input 99");
@@ -55,6 +58,8 @@ public class IntcodeComputer {
                 instruction7(command);
             } else if (command.endsWith("8")) {
                 instruction8(command);
+            } else if (command.endsWith("9")) {
+                instruction9(command);
             } else {
                 System.out.println("Invalid input, terminating");
                 System.out.println("Index is " + this.index);
@@ -65,17 +70,17 @@ public class IntcodeComputer {
         return -1;
     }
 
-    private ArrayList<String> populateParameters(String command) {
+    private ArrayList<String> populateParameters(String command, int count) {
         ArrayList<String> parameters = new ArrayList<>();
-        int length;
         for (int i = command.length() - 3; i >= 0; i--) {
             parameters.add(String.valueOf(command.charAt(i)));
         }
-        length = parameters.size();
-        for (int i = 2; i > length; i--) {
+        while (parameters.size()<count){
             parameters.add("0");
         }
         this.index++; // Index is now not on a value
+        System.out.println("Parameters" + Arrays.toString(parameters.toArray()));
+        System.out.println("index in parameters: " + this.index);
         return parameters;
     }
 
@@ -86,14 +91,18 @@ public class IntcodeComputer {
                 values.add(this.instructions[Math.toIntExact(this.instructions[this.index])]);
             } else if (parameter.equals("1")) {
                 values.add(this.instructions[this.index]);
+            } else if (parameter.equals("2")) {
+                int valueIndex = (int) (this.relativeIndex + this.instructions[this.index]);
+                values.add(this.instructions[valueIndex]);
             }
             this.index++;
         }
+        System.out.println("Values: " + Arrays.toString(values.toArray()));
         return values;
     }
 
     private void instruction1(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 3);
         ArrayList<Long> values = populateValues(parameters);
         long pos = this.instructions[this.index];
         Long sum = 0L;
@@ -106,7 +115,7 @@ public class IntcodeComputer {
     }
 
     private void instruction2(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 3);
         ArrayList<Long> values = populateValues(parameters);
         long pos = this.instructions[this.index];
         Long sum = 1L;
@@ -142,21 +151,15 @@ public class IntcodeComputer {
     }
 
     private void instruction4(String command) {
-        ArrayList<String> parameters = populateParameters(command);
-        long output;
-        if (parameters.get(0).equals("0")) {
-            output = this.instructions[Math.toIntExact(this.instructions[this.index])];
-        } else {
-            output = this.instructions[this.index];
-        }
+        ArrayList<String> parameters = populateParameters(command, 1);
+        ArrayList<Long> values = populateValues(parameters);
         //        System.out.println("index is " + this.index);
         //        System.out.println("Output is: " + output);
-        this.output.add(0, output);
-        this.index++;
+        this.output.add(0, values.get(0));
     }
 
     private void instruction5(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 1);
         ArrayList<Long> values = populateValues(parameters);
         if (values.get(0) != 0) {
             this.index = Math.toIntExact(values.get(1));
@@ -164,7 +167,7 @@ public class IntcodeComputer {
     }
 
     private void instruction6(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 1);
         ArrayList<Long> values = populateValues(parameters);
         if (values.get(0) == 0) {
             this.index = Math.toIntExact(values.get(1));
@@ -172,7 +175,7 @@ public class IntcodeComputer {
     }
 
     private void instruction7(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 2);
         ArrayList<Long> values = populateValues(parameters);
         int pos = Math.toIntExact(this.instructions[this.index]);
         long value = 0L;
@@ -185,7 +188,7 @@ public class IntcodeComputer {
     }
 
     private void instruction8(String command) {
-        ArrayList<String> parameters = populateParameters(command);
+        ArrayList<String> parameters = populateParameters(command, 2);
         ArrayList<Long> values = populateValues(parameters);
         int pos = Math.toIntExact(this.instructions[this.index]);
         long value = 0L;
@@ -195,6 +198,12 @@ public class IntcodeComputer {
         this.instructions[pos] = value;
         //        System.out.println("Writing " + value + " to position " + pos);
         this.index++;
+    }
+
+    private void instruction9(String command){
+        ArrayList<String> parameters = populateParameters(command, 1);
+        ArrayList<Long> values = populateValues(parameters);
+        this.relativeIndex += values.get(0);
     }
 
     public long getExitCode() {

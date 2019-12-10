@@ -1,0 +1,4 @@
+expand memory to include more indexes
+change memory type to hashmap<int, long>
+
+rewrite intcode... :(
