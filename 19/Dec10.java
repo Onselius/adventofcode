@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Dec10 {
@@ -22,12 +23,25 @@ public class Dec10 {
                 int count = countVisible(asteroids, asteroid);
                 visible.put(asteroid, count);
             }
-            printMax(visible);
+            List<Integer> spaceStations = getSpaceStation(visible);
+            TreeMap<Double, List<Integer>> angles = getAngles(asteroids, spaceStations);
+            int toBeDestroyed = 1;
+            while (toBeDestroyed < 200){
+                if (angles.isEmpty()){
+                    angles = getAngles(asteroids, spaceStations);
+                }
+                List<Integer> asteroid = angles.pollFirstEntry().getValue();
+                asteroids.remove(asteroid);
+                toBeDestroyed++;
+            }
+            List<Integer> asteroid = angles.pollFirstEntry().getValue();
+            System.out.println("number 200 to be destroyed is " + asteroid);
+            System.out.println("X * 100 + Y = " + (asteroid.get(0) * 100 + asteroid.get(1)));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    private static void printMax(HashMap<List<Integer>, Integer> visible){
+    private static List<Integer> getSpaceStation(HashMap<List<Integer>, Integer> visible){
         List<Integer> spaceStation = null;
         int highest = 0;
         for (List<Integer> asteroid: visible.keySet()){
@@ -41,15 +55,23 @@ public class Dec10 {
         } else {
             System.out.println("Could not find any asteroids :(");
         }
+        return spaceStation;
     }
     private static int countVisible(HashSet<List<Integer>> asteroids, List<Integer> current){
-        HashSet<Double> visible = new HashSet<>();
+        return getAngles(asteroids, current).size();
+    }
+
+    public static TreeMap<Double, List<Integer>> getAngles(HashSet<List<Integer>> asteroids, List<Integer> current) {
+        TreeMap<Double, List<Integer>> angles = new TreeMap<>();
         for (List<Integer> asteroid : asteroids){
-            double x = (double) (current.get(0) - asteroid.get(0));
-            double y = (double) (current.get(1) - asteroid.get(1));
-            double theta = Math.atan2(y, x);
-            visible.add(theta);
+            if (current.equals(asteroid)){
+                continue;
+            }
+            double x = asteroid.get(0) - current.get(0);
+            double y = asteroid.get(1) - current.get(1);
+            double theta = Math.atan2(x, y);
+            angles.put(0-theta, asteroid);
         }
-        return visible.size();
+        return angles;
     }
 }
