@@ -18,6 +18,28 @@ public class Dec07 {
 
             permutations("", part2, permutations);
             for (String seq: permutations) {
+                HashMap<IntcodeComputerv2, Long> settings = new HashMap<>(5);
+                ArrayList<IntcodeComputerv2> computers = new ArrayList<>(5);
+                int exitCode = 0;
+                for (int i = 0; i < seq.length(); i++) {
+                    IntcodeComputerv2 computer = new IntcodeComputerv2(instructions.clone());
+                    computers.add(computer);
+                    settings.put(computer, Long.parseLong(String.valueOf(seq.charAt(i))));
+                    computer.addInput(settings.get(computer));
+                }
+                while (exitCode != 99){
+                    for (IntcodeComputerv2 computer : computers){
+                        computer.addInput(input);
+                        exitCode = computer.run();
+                        input = computer.getOutput();
+                    }
+                }
+                signals.put(seq, input);
+                input = 0;
+            }
+            calculateMax(signals);
+            System.exit(1);
+            for (String seq: permutations) {
                 HashMap<IntcodeComputer, Integer> settings = new HashMap<>(5);
                 ArrayList<IntcodeComputer> computers = new ArrayList<>(5);
                 int exitCode = 0;
@@ -38,6 +60,8 @@ public class Dec07 {
                 input = 0;
             }
             calculateMax(signals);
+            signals.clear();
+            input = 0;
         } catch (IOException e) {
             e.printStackTrace();
         }
