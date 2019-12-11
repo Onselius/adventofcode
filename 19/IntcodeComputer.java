@@ -64,7 +64,7 @@ public class IntcodeComputer {
                         input = this.inputs.poll();
                     }
                     setValue(paramMode1, input);
-                    return 3;
+                    break;
                 case 4:
                     this.outputs.add(getValue(paramMode1));
                     break;
