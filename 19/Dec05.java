@@ -9,7 +9,7 @@ public class Dec05 {
             String baseString = reader.readLine();
             long[] instructions = Arrays.stream(baseString.split(",")).mapToLong(Integer::parseInt).toArray();
 
-            IntcodeComputer computer = new IntcodeComputer(instructions);
+            OldIntcodeComputer computer = new OldIntcodeComputer(instructions);
             long output = 0L;
             while (output == 0L){
                 computer.run();

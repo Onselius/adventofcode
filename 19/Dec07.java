@@ -18,17 +18,17 @@ public class Dec07 {
 
             permutations("", part2, permutations);
             for (String seq: permutations) {
-                HashMap<IntcodeComputerv2, Long> settings = new HashMap<>(5);
-                ArrayList<IntcodeComputerv2> computers = new ArrayList<>(5);
+                HashMap<IntcodeComputer, Long> settings = new HashMap<>(5);
+                ArrayList<IntcodeComputer> computers = new ArrayList<>(5);
                 int exitCode = 0;
                 for (int i = 0; i < seq.length(); i++) {
-                    IntcodeComputerv2 computer = new IntcodeComputerv2(instructions.clone());
+                    IntcodeComputer computer = new IntcodeComputer(instructions.clone());
                     computers.add(computer);
                     settings.put(computer, Long.parseLong(String.valueOf(seq.charAt(i))));
                     computer.addInput(settings.get(computer));
                 }
                 while (exitCode != 99){
-                    for (IntcodeComputerv2 computer : computers){
+                    for (IntcodeComputer computer : computers){
                         computer.addInput(input);
                         exitCode = computer.run();
                         input = computer.getOutput();
@@ -40,17 +40,17 @@ public class Dec07 {
             calculateMax(signals);
             System.exit(1);
             for (String seq: permutations) {
-                HashMap<IntcodeComputer, Integer> settings = new HashMap<>(5);
-                ArrayList<IntcodeComputer> computers = new ArrayList<>(5);
+                HashMap<OldIntcodeComputer, Integer> settings = new HashMap<>(5);
+                ArrayList<OldIntcodeComputer> computers = new ArrayList<>(5);
                 int exitCode = 0;
                 for (int i = 0; i < seq.length(); i++) {
-                    IntcodeComputer computer = new IntcodeComputer(instructions.clone());
+                    OldIntcodeComputer computer = new OldIntcodeComputer(instructions.clone());
                     computers.add(computer);
                     settings.put(computer, Integer.parseInt(String.valueOf(seq.charAt(i))));
                     computer.setInput(settings.get(computer));
                 }
                 while (exitCode != 99){
-                    for (IntcodeComputer computer : computers){
+                    for (OldIntcodeComputer computer : computers){
                         computer.setInput(input);
                         exitCode = computer.run();
                         input = computer.getOutput();

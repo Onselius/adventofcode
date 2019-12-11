@@ -1,222 +1,145 @@
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class IntcodeComputer {
-    private ArrayList<Long> input;
-    private ArrayList<Long> output;
-    private long[] instructions;
-    private int index;
-    private int relativeIndex;
+    private long index;
+    private long relative;
+    private HashMap<Long, Long> memory;
+    private Queue<Long> inputs;
+    private Queue<Long> outputs;
     private Scanner reader;
 
     public IntcodeComputer(long[] instructions) {
-        this.instructions = instructions;
         this.index = 0;
-        this.relativeIndex = 0;
+        this.relative = 0;
+        this.inputs = new LinkedList<>();
+        this.outputs = new LinkedList<>();
         this.reader = new Scanner(System.in);
-        this.input = new ArrayList<>(2);
-        this.output = new ArrayList<>(5);
+        this.memory = new HashMap<>(instructions.length + 50);
+        insertValues(instructions);
     }
-
-    public void setInput(long input) {
-        this.input.add(input);
-    }
-
-    public long getOutput() {
-        if (this.output.size() > 0) {
-            return this.output.get(0);
+    private void insertValues(long[] instructions){
+        for (int i = 0; i < instructions.length; i++){
+            this.memory.put((long) i, instructions[i]);
         }
-        return -666L;
     }
+    public HashMap<Long, Long> getMemory(){
+        return this.memory;
+    }
+    public void addInput(long input){
+        this.inputs.add(input);
+    }
+    public Long getOutput(){
+        return this.outputs.poll();
+    }
+    public int run(){
+        long data;
+        while (true){
+//            printStatus();
+            data = this.memory.get(this.index++);
+            int opcode = (int) (data % 100);
+            int paramMode1 = (int) (data / 100 % 10);
+            int paramMode2 = (int) (data / 1000 % 10);
+            int paramMode3 = (int) (data / 10000 % 10);
 
-    public int run() {
-        String command;
-        while (true) {
-            System.out.println("index: " + this.index);
-            System.out.println("relative. " + this.relativeIndex);
-            command = String.valueOf(this.instructions[this.index]);
-            if (command.endsWith("99")) {
-                System.out.println("Exited because of input 99");
-                return 99;
-            } else if (command.endsWith("1")) {
-                instruction1(command);
-            } else if (command.endsWith("2")) {
-                instruction2(command);
-            } else if (command.endsWith("3")) {
-                if (!instruction3(command)) {
+            switch (opcode){
+                case 99:
+                    return 99;
+                case 1:
+                    data = getValue(paramMode1) + getValue(paramMode2);
+                    setValue(paramMode3, data);
                     break;
-                }
-            } else if (command.endsWith("4")) {
-                instruction4(command);
-                break;
-            } else if (command.endsWith("5")) {
-                instruction5(command);
-            } else if (command.endsWith("6")) {
-                instruction6(command);
-            } else if (command.endsWith("7")) {
-                instruction7(command);
-            } else if (command.endsWith("8")) {
-                instruction8(command);
-            } else if (command.endsWith("9")) {
-                instruction9(command);
-            } else {
-                System.out.println("Invalid input, terminating");
-                System.out.println("Index is " + this.index);
-                System.out.println("Value is " + command);
-                break;
+                case 2:
+                    data = getValue(paramMode1) * getValue(paramMode2);
+                    setValue(paramMode3, data);
+                    break;
+                case 3:
+                    long input;
+                    if (this.inputs.isEmpty()){
+                        this.index--;
+                        return 3;
+                    } else {
+                        input = this.inputs.poll();
+                    }
+                    setValue(paramMode1, input);
+                    return 3;
+                case 4:
+                    this.outputs.add(getValue(paramMode1));
+                    break;
+                case 5:
+                    if (getValue(paramMode1) != 0){
+                        this.index = getValue(paramMode2);
+                    }else {
+                        this.index++;
+                    }
+                    break;
+                case 6:
+                    if (getValue(paramMode1) == 0) {
+                        this.index = getValue(paramMode2);
+                    }else {
+                        this.index++;
+                    }
+                    break;
+                case 7:
+                    if (getValue(paramMode1) < getValue(paramMode2)){
+                        setValue(paramMode3, 1);
+                    } else {
+                        setValue(paramMode3, 0);
+                    }
+                    break;
+                case 8:
+                    if (getValue(paramMode1) == getValue(paramMode2)){
+                        setValue(paramMode3, 1);
+                    } else {
+                        setValue(paramMode3, 0);
+                    }
+                    break;
+                case 9:
+                    this.relative += getValue(paramMode1);
+                    break;
             }
         }
-        return -1;
     }
-
-    private ArrayList<String> populateParameters(String command, int count) {
-        ArrayList<String> parameters = new ArrayList<>();
-        for (int i = command.length() - 3; i >= 0; i--) {
-            parameters.add(String.valueOf(command.charAt(i)));
-        }
-        while (parameters.size()<count){
-            parameters.add("0");
-        }
-        this.index++; // Index is now not on a value
-        System.out.println("Parameters" + Arrays.toString(parameters.toArray()));
-        System.out.println("index in parameters: " + this.index);
-        return parameters;
+    public long getExitCode(){
+        return this.memory.get(0L);
     }
-
-    private ArrayList<Long> populateValues(ArrayList<String> parameters) {
-        ArrayList<Long> values = new ArrayList<>(parameters.size());
-        for (String parameter : parameters) {
-            switch (parameter) {
-                case "0":
-                    values.add(this.instructions[Math.toIntExact(this.instructions[this.index])]);
-                    break;
-                case "1":
-                    values.add(this.instructions[this.index]);
-                    break;
-                case "2":
-                    int valueIndex = (int) (this.relativeIndex + this.instructions[this.index]);
-                    values.add(this.instructions[valueIndex]);
-                    break;
-            }
-            this.index++;
-        }
-        System.out.println("Values: " + Arrays.toString(values.toArray()));
-        return values;
-    }
-
-    private void instruction1(String command) {
-        ArrayList<String> parameters = populateParameters(command, 3);
-        ArrayList<Long> values = populateValues(parameters);
-        long pos = this.instructions[this.index];
-        Long sum = 0L;
-        for (Long number : values) {
-            sum += number;
-        }
-        this.instructions[Math.toIntExact(pos)] = sum;
-        //        System.out.println("Writing " + sum + " to position " + pos);
-        this.index++; //Index is now on next instruction
-    }
-
-    private void instruction2(String command) {
-        ArrayList<String> parameters = populateParameters(command, 3);
-        ArrayList<Long> values = populateValues(parameters);
-        long pos = this.instructions[this.index];
-        Long sum = 1L;
-        for (Long number : values) {
-            sum *= number;
-        }
-        this.instructions[Math.toIntExact(pos)] = sum;
-        //        System.out.println("Writing " + sum + " to position " + pos);
-        this.index++;
-    }
-
-    private boolean instruction3(String command) {
-        Long input;
-        if (this.input.isEmpty()) {
-            System.out.print("Enter input: ");
-            String userInput = this.reader.nextLine();
-            if (userInput.equals("")) {
-                return false;
-            }
-            input = Long.parseLong(userInput);
+    private void setValue(int mode, long value){
+        if (mode == 0 || mode == 1){
+            this.memory.put(getValue(1), value);
         } else {
-            input = this.input.get(0);
-            this.input.remove(0);
-        }
-        //        System.out.println("index for input is: " + this.index);
-        this.index++;
-        long pos = this.instructions[this.index];
-        this.instructions[Math.toIntExact(pos)] = input;
-        //        System.out.println("Writing " + input + " to position " + pos);
-        //        System.out.println("Size of inputlist is " + this.inputList.size());
-        this.index++;
-        return true;
-    }
-
-    private void instruction4(String command) {
-        ArrayList<String> parameters = populateParameters(command, 1);
-        ArrayList<Long> values = populateValues(parameters);
-        //        System.out.println("index is " + this.index);
-        //        System.out.println("Output is: " + output);
-        this.output.add(0, values.get(0));
-    }
-
-    private void instruction5(String command) {
-        ArrayList<String> parameters = populateParameters(command, 1);
-        ArrayList<Long> values = populateValues(parameters);
-        if (values.get(0) != 0) {
-            this.index = Math.toIntExact(values.get(1));
+            this.memory.put(getValue(3), value);
         }
     }
 
-    private void instruction6(String command) {
-        ArrayList<String> parameters = populateParameters(command, 1);
-        ArrayList<Long> values = populateValues(parameters);
-        if (values.get(0) == 0) {
-            this.index = Math.toIntExact(values.get(1));
+    private long getValue(int mode){
+        long value = 0;
+        try {
+            switch (mode){
+                case 0:
+                    value = this.memory.get(this.memory.get(this.index++));
+                    break;
+                case 1:
+                    value = this.memory.get(this.index++);
+                    break;
+                case 2:
+                    value = this.memory.get(this.memory.get(this.index++) + this.relative);
+                    break;
+                case 3:
+                    value = this.memory.get(this.index++) + this.relative;
+            }
+        } catch (Exception e) {
+            value = 0;
         }
+        return value;
     }
-
-    private void instruction7(String command) {
-        ArrayList<String> parameters = populateParameters(command, 2);
-        ArrayList<Long> values = populateValues(parameters);
-        int pos = Math.toIntExact(this.instructions[this.index]);
-        long value = 0L;
-        if (values.get(0) < values.get(1)) {
-            value = 1L;
-        }
-        this.instructions[pos] = value;
-        //        System.out.println("Writing " + value + " to position " + pos);
-        this.index++;
-    }
-
-    private void instruction8(String command) {
-        ArrayList<String> parameters = populateParameters(command, 2);
-        ArrayList<Long> values = populateValues(parameters);
-        int pos = Math.toIntExact(this.instructions[this.index]);
-        long value = 0L;
-        if (values.get(0).equals(values.get(1))) {
-            value = 1L;
-        }
-        this.instructions[pos] = value;
-        //        System.out.println("Writing " + value + " to position " + pos);
-        this.index++;
-    }
-
-    private void instruction9(String command){
-        ArrayList<String> parameters = populateParameters(command, 1);
-        ArrayList<Long> values = populateValues(parameters);
-        this.relativeIndex += values.get(0);
-    }
-
-    public long getExitCode() {
-        return this.instructions[0];
-    }
-
-    public void printInstructions() {
-        for (int i = 0; i < this.index; i++) {
-            System.out.println(this.instructions[i]);
-        }
+    private void printStatus(){
+        System.out.println("Index: " + this.index);
+        System.out.println("Relative: " + this.relative);
+        long value = this.memory.get(this.index);
+        System.out.println("Value: " + this.memory.get(this.index));
+        System.out.println("Value at index: " + this.memory.get(value));
+//        System.out.println("Memory: " + this.memory);
     }
 }
