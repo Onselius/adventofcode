@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -49,18 +50,15 @@ public class Dec12 {
         }
         //PART2
         moons = originalState.clone();
-        long foundX = findX(moons);
+        long foundX = findPosition(moons, 0);
         moons = originalState.clone();
-        long foundY = findY(moons);
+        long foundY = findPosition(moons, 1);
         moons = originalState.clone();
-        long foundZ = findZ(moons);
+        long foundZ = findPosition(moons, 2);
 
-        System.out.println(foundX);
-        System.out.println(foundY);
-        System.out.println(foundZ);
         long lcmXY = leastCommonMultiple(foundX, foundY);
         long lcmXYZ = leastCommonMultiple(lcmXY, foundZ);
-        System.out.println("GCD for all positions is " + lcmXYZ);
+        System.out.println("LCM for all positions is " + lcmXYZ);
         timer.stopTime();
     }
     public static long leastCommonMultiple(long n1, long n2){
@@ -72,7 +70,7 @@ public class Dec12 {
         }
         return lcm;
     }
-    public static long findX(Moon[] moons){
+    public static long findPosition(Moon[] moons, int index){
         long tick = 0;
         HashSet<List<Integer>> position = new HashSet<>();
         while (true){
@@ -84,56 +82,8 @@ public class Dec12 {
             }
             List<Integer> pos = new ArrayList<>();
             for (Moon moon: moons){
-                pos.add(moon.posX);
-                pos.add(moon.velX);
-            }
-            if (position.contains(pos)){
-                System.out.println("Found duplicate after " + tick + " ticks");
-                break;
-            }
-            position.add(pos);
-            tick++;
-        }
-        return tick;
-    }
-    public static long findY(Moon[] moons){
-        long tick = 0;
-        HashSet<List<Integer>> position = new HashSet<>();
-        while (true){
-            for (int i = 0; i < moons.length - 1; i++){
-                moons[i].calculateVelocity(moons, i);
-            }
-            for (Moon moon: moons){
-                moon.move();
-            }
-            List<Integer> pos = new ArrayList<>();
-            for (Moon moon: moons){
-                pos.add(moon.posY);
-                pos.add(moon.velY);
-            }
-            if (position.contains(pos)){
-                System.out.println("Found duplicate after " + tick + " ticks");
-                break;
-            }
-            position.add(pos);
-            tick++;
-        }
-        return tick;
-    }
-    public static long findZ(Moon[] moons){
-        long tick = 0;
-        HashSet<List<Integer>> position = new HashSet<>();
-        while (true){
-            for (int i = 0; i < moons.length - 1; i++){
-                moons[i].calculateVelocity(moons, i);
-            }
-            for (Moon moon: moons){
-                moon.move();
-            }
-            List<Integer> pos = new ArrayList<>();
-            for (Moon moon: moons){
-                pos.add(moon.posZ);
-                pos.add(moon.velZ);
+                pos.add(moon.getPosition()[index]);
+                pos.add(moon.getVelocity()[index]);
             }
             if (position.contains(pos)){
                 System.out.println("Found duplicate after " + tick + " ticks");
@@ -147,63 +97,57 @@ public class Dec12 {
 }
 
 class Moon{
-    public int posX;
-    public int posY;
-    public int posZ;
-    public int velX;
-    public int velY;
-    public int velZ;
+    private int[] position;
+    private int[] velocity;
 
     public Moon(int posX, int posY, int posZ) {
-        this.posX = posX;
-        this.posY = posY;
-        this.posZ = posZ;
-        this.velX = 0;
-        this.velY = 0;
-        this.velZ = 0;
+        this.position = new int[]{posX, posY, posZ};
+        this.velocity = new int[]{0,0,0};
+    }
+    public int[] getPosition(){
+        return this.position;
+    }
+    public int[] getVelocity() {
+        return velocity;
     }
     public void calculateVelocity(Moon[] moons, int myIndex){
         for (int i = myIndex+1; i < moons.length; i++){
             Moon moon = moons[i];
-            if (moon.posX < this.posX){
-                this.velX--;
-                moon.velX++;
-            } else if (moon.posX > this.posX){
-                this.velX++;
-                moon.velX--;
-            }
-            if (moon.posY < this.posY){
-                this.velY--;
-                moon.velY++;
-            } else if (moon.posY > this.posY){
-                this.velY++;
-                moon.velY--;
-            }
-            if (moon.posZ < this.posZ){
-                this.velZ--;
-                moon.velZ++;
-            } else if (moon.posZ > this.posZ){
-                this.velZ++;
-                moon.velZ--;
+            for (int j = 0; j < 3; j++){
+                if (moon.position[j] < this.position[j]){
+                    this.velocity[j]--;
+                    moon.velocity[j]++;
+                } else if (moon.position[j] > this.position[j]){
+                    this.velocity[j]++;
+                    moon.velocity[j]--;
+                }
             }
         }
     }
     public void move(){
-        this.posX += this.velX;
-        this.posY += this.velY;
-        this.posZ += this.velZ;
+        for (int i = 0; i < 3; i++){
+            this.position[i] += this.velocity[i];
+        }
     }
     public int getTotalEnergy(){
         return getPotentialEnergy() * getKineticEnergy();
     }
     private int getKineticEnergy(){
-        return Math.abs(this.velX) + Math.abs(this.velY) + Math.abs(this.velZ);
+        int sum = 0;
+        for (int i: this.velocity){
+            sum += Math.abs(i);
+        }
+        return sum;
     }
     private int getPotentialEnergy(){
-        return Math.abs(this.posX) + Math.abs(this.posY) + Math.abs(this.posZ);
+        int sum = 0;
+        for (int i: this.position){
+            sum += Math.abs(i);
+        }
+        return sum;
     }
     public String toString(){
-        return "Moon posX:" + this.posX + " posY:" + this.posY + " posZ:" + this.posZ
-                + " velX:" + this.velX + " velY: " + this.velY + " velZ:" + this.velZ;
+        return "Moon posX:" + this.position[0] + " posY:" + this.position[1] + " posZ:" + this.position[2]
+                + " velX:" + this.velocity[0] + " velY: " + this.velocity[1] + " velZ:" + this.velocity[2];
     }
 }
