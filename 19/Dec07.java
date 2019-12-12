@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class Dec07 {
     public static void main(String[] args) {
+        Timer timer = new Timer();
         File file = new File("19/input07.txt");
         long input = 0L;
         String part1 = "01234";
@@ -38,6 +39,7 @@ public class Dec07 {
                 input = 0;
             }
             calculateMax(signals);
+            timer.stopTime();
             System.exit(1);
             for (String seq: permutations) {
                 HashMap<OldIntcodeComputer, Integer> settings = new HashMap<>(5);
@@ -65,6 +67,7 @@ public class Dec07 {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        timer.stopTime();
     }
     private static void calculateMax(HashMap<String, Long> signals){
         String signal = "";

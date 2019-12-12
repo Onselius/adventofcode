@@ -1,9 +1,9 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Dec10 {
     public static void main(String[] args) {
+        Timer timer = new Timer();
         File file = new File("19/input10.txt");
         String input;
         HashSet<List<Integer>> asteroids = new HashSet<>(441);
@@ -40,6 +40,7 @@ public class Dec10 {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        timer.stopTime();
     }
     private static List<Integer> getSpaceStation(HashMap<List<Integer>, Integer> visible){
         List<Integer> spaceStation = null;
