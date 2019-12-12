@@ -11,7 +11,7 @@ public class Dec11 {
     public static void main(String[] args) {
         File file = new File("19/input11.txt");
         BufferedReader reader;
-        List<Integer> position = new ArrayList<>(List.of(0,0));
+        List<Integer> position = new ArrayList<>(List.of(150,150));
         String direction = "up";
         HashMap<List<Integer>, Integer> panels = new HashMap<>();
         try {
@@ -21,7 +21,7 @@ public class Dec11 {
             IntcodeComputer computer = new IntcodeComputer(instructions);
 
             int exitCode = 0;
-            long input = 0;
+            long input = 1;
             int output;
             int i = 0;
             while (exitCode != 99){
@@ -33,7 +33,7 @@ public class Dec11 {
 //                System.out.println("exitcode " + exitCode);
                 output = Math.toIntExact(computer.getOutput());
                 System.out.println("output1 " + output);
-                panels.put(position, output);
+                panels.put(new ArrayList<>(position), output);
                 output = Math.toIntExact(computer.getOutput());
                 System.out.println("output2 " + output);
                 if (output == 0){
@@ -47,7 +47,7 @@ public class Dec11 {
             }
             System.out.println(i);
             System.out.println("number of panels: " + panels.size());
-            //1655 to low
+            printGrid(panels);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,10 +81,10 @@ public class Dec11 {
     private static void moveRobot(List<Integer> position, String direction){
         switch (direction){
             case "up":
-                position.set(1, position.get(1) + 1);
+                position.set(1, position.get(1) - 1);
                 break;
             case "down":
-                position.set(1, position.get(1) - 1);
+                position.set(1, position.get(1) + 1);
                 break;
             case "left":
                 position.set(0, position.get(0) - 1);
@@ -93,7 +93,20 @@ public class Dec11 {
                 position.set(0, position.get(0) + 1);
                 break;
         }
-
     }
-
+    private static void printGrid(HashMap<List<Integer>, Integer> panels){
+        for (int y = 145; y < 160; y++){
+            for (int x = 145; x < 200; x++){
+                List<Integer> position = new ArrayList<>(List.of(x,y));
+                String value = String.valueOf(panels.getOrDefault(position, 0));
+                if (value.equals("1")){
+                    value = "#";
+                } else {
+                    value = "-";
+                }
+                System.out.print(value);
+            }
+            System.out.println();
+        }
+    }
 }
