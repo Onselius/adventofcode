@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Dec11 {
     public static void main(String[] args) {
+        Timer timer = new Timer();
         File file = new File("19/input11.txt");
         BufferedReader reader;
         List<Integer> position = new ArrayList<>(List.of(150,150));
@@ -29,8 +30,6 @@ public class Dec11 {
                 exitCode = computer.run();
                 System.out.println("position " + position);
                 System.out.println("direction " + direction);
-//                System.out.println("input " + input);
-//                System.out.println("exitcode " + exitCode);
                 output = Math.toIntExact(computer.getOutput());
                 System.out.println("output1 " + output);
                 panels.put(new ArrayList<>(position), output);
@@ -51,6 +50,7 @@ public class Dec11 {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        timer.stopTime();
     }
     private static String turnRight(String direction){
         switch (direction){
