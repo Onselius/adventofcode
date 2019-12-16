@@ -1,13 +1,11 @@
 import java.io.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Dec14 {
     public static void main(String[] args) {
         File file = new File("19/input14.txt");
         String input;
-        Map<Chemical, Integer> chemicals = new HashMap<>();
+        Map<Chemical, Long> chemicals = new HashMap<>();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -23,8 +21,8 @@ public class Dec14 {
 
                 if ((chemical = getChemicalByName(chemicals.keySet(), name)) == null){
                     chemical = new Chemical(name);
-                    chemical.setAmount(Integer.parseInt(amount));
                 }
+                chemical.setAmount(Integer.parseInt(amount));
                 for (String string: splitString[0].split(", ")){
                     amount = string.split(" ")[0];
                     name = string.split(" ")[1];
@@ -32,25 +30,123 @@ public class Dec14 {
                        component = new Chemical(name);
                     }
                     chemical.addComponent(component, Integer.parseInt(amount));
+                    chemicals.put(component, 0L);
                 }
-            chemicals.put(chemical,chemical.getAmount());
+            chemicals.put(chemical, 0L);
             }
             System.out.println(chemicals);
             for (Chemical chemical: chemicals.keySet()){
                 System.out.println(chemical.longString());
             }
-            getOres(chemicals, "FUEL");
+            name = "FUEL";
+            Map<Chemical, Long> startValues = new HashMap<>(chemicals);
+            chemicals.put(getChemicalByName(chemicals.keySet(), name), 1L);
+            getOres(chemicals, name, chemicals.get(getChemicalByName(chemicals.keySet(), name)));
             System.out.println(chemicals);
+            System.out.println(chemicals.get(getChemicalByName(chemicals.keySet(), "ORE")));
+            getFuel(startValues, 1000000000000L);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public static void getOres(Map<Chemical, Integer> chemicals, String name){
+    public static void getFuel(Map<Chemical, Long> startValues, long amount){
+        long fuelMin = 1;
+        long fuelMax = 1000000000;
+        long fuel;
+        long ore = 0;
+        String name = "FUEL";
+        while (fuelMax - fuelMin > 1){
+            fuel = (fuelMin + fuelMax) / 2;
+            Map<Chemical, Long> chemicals = new HashMap<>(startValues);
+            chemicals.put(getChemicalByName(chemicals.keySet(), name), fuel);
+            getOres(chemicals, name, fuel);
+            ore = chemicals.get(getChemicalByName(chemicals.keySet(), "ORE"));
+            System.out.println("Amount of ore: " + ore);
+            System.out.println("Creates how much fuel: " + fuel);
+            System.out.println();
+            if (ore <= amount){
+                fuelMin = fuel;
+            } else {
+                fuelMax = fuel;
+            }
+        }
+        System.out.println("Answer is: " + fuelMin);
+    }
+    public static void getOres(Map<Chemical, Long> chemicals, String name, long amount){
         Chemical startChem = getChemicalByName(chemicals.keySet(), name);
-        for (Chemical chem: startChem.getComponents().keySet()){
-            int orgAmount = chemicals.get(chem);
-            int compAmount = startChem.getComponentAmount(chem);
-            chemicals.put(chem, orgAmount + compAmount);
+        for (Chemical component: startChem.getComponents().keySet()){
+            if (component.getName().equals("ORE")){
+                chemicals.put(component, chemicals.get(component) + startChem.getComponentAmount(component) * amount);
+                return;
+            }
+            double amountOfComponent = chemicals.get(component) + (startChem.getComponentAmount(component) * amount);
+            if (amountOfComponent > 0){
+                int createAmount = (int) Math.ceil(amountOfComponent / component.getAmount());
+                long updateValue = (long) amountOfComponent % component.getAmount();
+                if (updateValue != 0) {
+                    updateValue = (long) amountOfComponent % component.getAmount() - component.getAmount();
+                }
+                chemicals.put(component, updateValue);
+                getOres(chemicals, component.getName(), createAmount);
+            } else {
+                chemicals.put(component, (long) amountOfComponent);
+            }
+
+
+
+            /* This is what happens when overthinking and not starting over
+
+
+            if (compAmount > unusedAmount){
+                if (compAmount % component.getAmount() != 0){
+                    unusedAmount = component.getAmount() - (compAmount % component.getAmount());
+                } else {
+                    unusedAmount = 0;
+                }
+                System.out.println("unused:" + unusedAmount);
+                if (unusedAmount + unused.getOrDefault(component.getName(), 0) >= component.getAmount()){
+                    compAmount -= unusedAmount;
+                    System.out.println("compoamount: " + compAmount);
+                    unusedAmount -= component.getAmount() - unused.getOrDefault(component.getName(), 0);
+                    System.out.println("unusedamount: " + unusedAmount);
+                    unused.put(component.getName(), unusedAmount);
+                } else {
+                    unused.put(component.getName(), unusedAmount + unused.getOrDefault(component.getName(), 0));
+                }
+                chemicals.put(component, compAmount + unusedAmount + orgAmount);
+                System.out.println("chemicals: " + chemicals);
+                System.out.println("unused: " + unused);
+                getOres(chemicals, component.getName(), ((compAmount + unused.get(component.getName()))/component.getAmount()), unused);
+            } else {
+                unused.put(component.getName(), unusedAmount - compAmount);
+            }
+/*
+            ANOTHER EXAMPLE OF OVERTHINKING
+            while (startChem.getComponentAmount(component) * (amount + unusedAmount) % startChem.getAmount() != 0){
+                unusedAmount++;
+                System.out.println("increaseamount: " + unusedAmount);
+            }
+            compAmount = startChem.getComponentAmount(component) * (amount + unusedAmount) / startChem.getAmount();
+            chemicals.put(component, compAmount + orgAmount);
+            compAmount = startChem.getComponentAmount(component) * (amount + unusedAmount) / startChem.getAmount();
+            if (unusedAmount > 0){
+                int oldUnusedAmount = unusedAmount;
+                unusedAmount = unused.getOrDefault(startChem.getName(), 0);
+                unused.put(startChem.getName(), oldUnusedAmount - unusedAmount);
+                System.out.println("unused: " + unused);
+                System.out.println("Updating unused amount by: " + (oldUnusedAmount - unusedAmount));
+            }
+            chemicals.put(component, orgAmount + compAmount);
+            if ((chemicals.get(startChem) + unusedAmount) / startChem.getAmount() >= startChem.getAmount()) {
+                System.out.println("increasing " + startChem.getName() + " with " + unusedAmount);
+//                chemicals.put(startChem, chemicals.get(startChem) + unusedAmount);
+            }
+            System.out.println("Increasing " + component.getName() + " with " + compAmount);
+            if (chemicals.get(component) >= component.getAmount()) {
+                getOres(chemicals, component.getName(), compAmount, unused);
+            }
+
+            */
         }
     }
     public static Chemical getChemicalByName(Set<Chemical> chemicals, String name){
@@ -71,7 +167,7 @@ class Chemical{
     public Chemical(String name) {
         this.name = name;
         this.components = new HashMap<>();
-        this.amount = 0;
+        this.amount = 1;
     }
 
     public int getComponentAmount(Chemical chemical){
