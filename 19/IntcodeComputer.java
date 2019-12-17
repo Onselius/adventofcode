@@ -118,16 +118,16 @@ public class IntcodeComputer {
         try {
             switch (mode){
                 case 0:
-                    value = this.memory.get(this.memory.get(this.index++));
+                    value = this.memory.getOrDefault(this.memory.get(this.index++),0L);
                     break;
                 case 1:
-                    value = this.memory.get(this.index++);
+                    value = this.memory.getOrDefault(this.index++,0L);
                     break;
                 case 2:
-                    value = this.memory.get(this.memory.get(this.index++) + this.relative);
+                    value = this.memory.getOrDefault(this.memory.getOrDefault(this.index++,0L) + this.relative,0L);
                     break;
                 case 3:
-                    value = this.memory.get(this.index++) + this.relative;
+                    value = this.memory.getOrDefault(this.index++,0L) + this.relative;
             }
         } catch (Exception e) {
             value = 0;
