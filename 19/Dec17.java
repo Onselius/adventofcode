@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Day17 {
+public class Dec17 {
     public static void main(String[] args) {
         File file = new File("19/input17.txt");
         IntcodeComputer computer;
