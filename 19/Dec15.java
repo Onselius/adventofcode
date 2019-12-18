@@ -102,9 +102,9 @@ class Dec15New{
         IntcodeComputer computer;
         int exitCode = 0;
         String basestring;
-        ArrayList<Integer> position = new ArrayList<>(List.of(21,21));
-        ArrayList<Integer> nextPosition = new ArrayList<>(position);
-        ArrayList<Integer> oxygen = null;
+        List<Integer> position = new ArrayList<>(List.of(21,21));
+        List<Integer> nextPosition = new ArrayList<>(position);
+        List<Integer> oxygen = new ArrayList<>(List.of(100,100));
 
         LinkedList<Integer> directions = new LinkedList<>();
         Map<List<Integer>, Integer> grid = new LinkedHashMap<>();
@@ -127,37 +127,54 @@ class Dec15New{
                         grid.put(List.copyOf(nextPosition), -1);
                         nextPosition.set(0, position.get(0));
                         nextPosition.set(1, position.get(1));
-//                        grid[newPosition[0]][newPosition[1]] = "#";
- //                       newPosition = Arrays.copyOf(position, position.length);
+                        directions.removeLast();
                         break;
                     case 1:
                         grid.putIfAbsent(List.copyOf(nextPosition), grid.get(position)+1);
                         position.set(0, nextPosition.get(0));
                         position.set(1, nextPosition.get(1));
-  //                      position = Arrays.copyOf(newPosition, newPosition.length);
                         break;
                     case 2:
                         grid.putIfAbsent(List.copyOf(nextPosition), grid.get(position)+1);
                         oxygen = new ArrayList<>(nextPosition);
                         position.set(0, nextPosition.get(0));
                         position.set(1, nextPosition.get(1));
-   //                     position = Arrays.copyOf(newPosition, newPosition.length);
-    //                    System.out.println("Found oxygen system at: " + Arrays.toString(position));
                 }
-                printGrid(grid, position, oxygen);
-                Thread.sleep(50);
-   //             grid[position[0]][position[1]] = ".";
-//                printGrid(grid, position);
+//                printGrid(grid, position, oxygen);
 //                Thread.sleep(100);
-//                System.out.println("Position: " + Arrays.toString(position));
-//                System.out.println("New position: " + Arrays.toString(newPosition));
             }
             printGrid(grid, position, oxygen);
             System.out.println("Found oxygen at " + oxygen);
             System.out.println("Steps to oxygen: "+ grid.get(oxygen));
-    //        grid[21][21] = "S";
-    //        Dec15.printGrid(grid, position);
+            //PART 2
+            System.out.println("START OF PART 2");
+            Thread.sleep(1000);
+            Map<List<Integer>, Integer> oxygenGrid = new LinkedHashMap<>();
+            grid.forEach((key, value) -> {
+                if (value == -1){
+                    oxygenGrid.put(key, value);
+                }
+            });
+            oxygenGrid.put(List.copyOf(oxygen),0);
+            position.set(0, oxygen.get(0));
+            position.set(1, oxygen.get(1));
+            nextPosition.set(0, position.get(0));
+            nextPosition.set(1, position.get(1));
+            Queue<List<Integer>> queue = new LinkedList<>();
 
+            queue.add(position);
+            command = 0;
+            while (command > -1){
+                command = getInput(oxygenGrid, nextPosition, directions);
+                directions.add(command);
+                oxygenGrid.putIfAbsent(List.copyOf(nextPosition), oxygenGrid.get(position)+1);
+                position.set(0, nextPosition.get(0));
+                position.set(1, nextPosition.get(1));
+
+                printGrid(oxygenGrid, position, oxygen);
+                Thread.sleep(100);
+            }
+            printGrid(oxygenGrid, position, oxygen);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -186,12 +203,14 @@ class Dec15New{
         }
         if (stringBuilder.length() > 0){
             input = String.valueOf((stringBuilder.toString()).charAt(random.nextInt(stringBuilder.length())));
-            directions.add(Integer.valueOf(input));
+            directions.add(Integer.parseInt(input));
         } else {
             if (directions.size() == 0){
                 return -1;
             }
-            input = String.valueOf(reverseInput(directions.removeLast()));
+            int lastInput = directions.removeLast();
+            lastInput = reverseInput(lastInput);
+            input = String.valueOf(lastInput);
         }
         switch (Integer.parseInt(input)){
             case 1:
@@ -207,6 +226,7 @@ class Dec15New{
                 nextPosition.set(1, nextPosition.get(1)+1);
                 break;
         }
+        System.out.println("command: " + input);
 
         return Integer.parseInt(input);
 
@@ -216,15 +236,21 @@ class Dec15New{
             for (int x = 0; x < 42; x++){
                 if (position.get(0) == y && position.get(1) == x){
                     System.out.print("D");
-//                } else if (oxygen.get(0) == y && oxygen.get(1) == x){
-//                    System.out.print("O");
+                } else if (oxygen.get(0) == y && oxygen.get(1) == x){
+                    System.out.print("O");
                 } else if (y == 21 && x == 21){
                     System.out.print("S");
                 } else if (grid.containsKey(List.of(y,x))){
-                    if (grid.get(List.of(y,x)) > 0){
-                        System.out.print(".");
-                    } else {
-                        System.out.print("#");
+                    switch (grid.get(List.of(y,x))){
+                        case -1:
+                            System.out.print("#");
+                            break;
+                        case -2:
+                            System.out.print("0");
+                            break;
+                        default:
+                            System.out.print(".");
+                            break;
                     }
                 } else {
                     System.out.print("?");
