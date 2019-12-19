@@ -183,7 +183,6 @@ class OldUsingRandom {
         IntcodeComputer computer;
         int exitCode = 0;
         String basestring;
-        HashMap<List<Integer>, Integer> tileValues = new HashMap<>();
         int[] position = new int[]{21,21};
         int[] newPosition = position.clone();
         String[][] grid = new String[42][42];
