@@ -1,101 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Dec15 {
-    public static void main(String[] args) throws InterruptedException {
-        File file = new File("19/input15.txt");
-        long[] instructions;
-        IntcodeComputer computer;
-        int exitCode = 0;
-        String basestring;
-        HashMap<List<Integer>, Integer> tileValues = new HashMap<>();
-        int[] position = new int[]{21,21};
-        int[] newPosition = position.clone();
-        String[][] grid = new String[42][42];
-        for (String[] strings: grid){
-            Arrays.fill(strings, "?");
-        }
-        grid[position[0]][position[1]] = ".";
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            basestring = reader.readLine();
-            instructions = Arrays.stream(basestring.split(",")).mapToLong(Long::parseLong).toArray();
-            computer = new IntcodeComputer(instructions);
-            int command = getInput(grid, newPosition);
-            long output;
-            startWhile:
-            while (exitCode != 99){
-                computer.addInput(command);
-                exitCode = computer.run();
-                output = computer.getOutput();
-                switch ((int) output){
-                    case 0:
-                        grid[newPosition[0]][newPosition[1]] = "#";
-                        newPosition = Arrays.copyOf(position, position.length);
-                        break;
-                    case 1:
-                        position = Arrays.copyOf(newPosition, newPosition.length);
-                        break;
-                    case 2:
-                        position = Arrays.copyOf(newPosition, newPosition.length);
-                        System.out.println("Found oxygen system at: " + Arrays.toString(position));
-                        break startWhile;
-                }
-                grid[position[0]][position[1]] = ".";
-                command = getInput(grid, newPosition);
-//                printGrid(grid, position);
-//                Thread.sleep(100);
-//                System.out.println("Position: " + Arrays.toString(position));
-//                System.out.println("New position: " + Arrays.toString(newPosition));
-            }
-            grid[21][21] = "S";
-            printGrid(grid, position);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public static int getInput(String[][] grid, int[] newPosition){
-        Random random = new Random();
-        int command = random.nextInt(4) + 1;
-        switch (command){
-            case 1:
-                newPosition[0]--;
-                break;
-            case 2:
-                newPosition[0]++;
-                break;
-            case 3:
-                newPosition[1]--;
-                break;
-            case 4:
-                newPosition[1]++;
-                break;
-        }
-        return command;
-    }
-    public static void printGrid(String[][] grid, int[] position){
-        for (int y = 0; y < grid.length; y++) {
-            String[] rows = grid[y];
-            for (int x = 0; x < rows.length; x++) {
-                if (y == position[0] && x == position[1]){
-                    System.out.print("D");
-                    continue;
-                }
-                System.out.print(rows[x]);
-            }
-            System.out.println();
-        }
-    }
-}
-/*
-Backtracking input
-x -= 1
-x ^= 1
-x += 1
- */
-class Dec15New{
+class Dec15{
     public static void main(String[] args) throws InterruptedException {
         File file = new File("19/input15.txt");
         long[] instructions;
@@ -140,8 +46,8 @@ class Dec15New{
                         position.set(0, nextPosition.get(0));
                         position.set(1, nextPosition.get(1));
                 }
-//                printGrid(grid, position, oxygen);
-//                Thread.sleep(100);
+                printGrid(grid, position, oxygen);
+                Thread.sleep(100);
             }
             printGrid(grid, position, oxygen);
             System.out.println("Found oxygen at " + oxygen);
@@ -160,21 +66,32 @@ class Dec15New{
             position.set(1, oxygen.get(1));
             nextPosition.set(0, position.get(0));
             nextPosition.set(1, position.get(1));
-            Queue<List<Integer>> queue = new LinkedList<>();
-
+            LinkedList<List<Integer>> queue = new LinkedList<>();
             queue.add(position);
             command = 0;
-            while (command > -1){
-                command = getInput(oxygenGrid, nextPosition, directions);
-                directions.add(command);
-                oxygenGrid.putIfAbsent(List.copyOf(nextPosition), oxygenGrid.get(position)+1);
-                position.set(0, nextPosition.get(0));
-                position.set(1, nextPosition.get(1));
-
-                printGrid(oxygenGrid, position, oxygen);
-                Thread.sleep(100);
+            while (!queue.isEmpty()){
+                for (int i = 0, l = queue.size(); i < l; i++){
+                    position.set(0, queue.peek().get(0));
+                    position.set(1, queue.poll().get(1));
+                    nextPosition.set(0, position.get(0));
+                    nextPosition.set(1, position.get(1));
+                    getInput(oxygenGrid, nextPosition, directions);
+                    do {
+                        if (!oxygenGrid.containsKey(nextPosition)) {
+                            queue.add(List.copyOf(nextPosition));
+                        }
+                        oxygenGrid.putIfAbsent(List.copyOf(nextPosition), oxygenGrid.get(position)+1);
+                        nextPosition.set(0, position.get(0));
+                        nextPosition.set(1, position.get(1));
+                        command = getInput(oxygenGrid, nextPosition, directions);
+                    } while (command > 0);
+                }
+//                printGrid(oxygenGrid, position, oxygen);
+//                Thread.sleep(100);
             }
             printGrid(oxygenGrid, position, oxygen);
+            System.out.println("Last position is: " + position);
+            System.out.println("Number of steps to last position: " + oxygenGrid.get(position));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -226,8 +143,6 @@ class Dec15New{
                 nextPosition.set(1, nextPosition.get(1)+1);
                 break;
         }
-        System.out.println("command: " + input);
-
         return Integer.parseInt(input);
 
     }
@@ -261,3 +176,97 @@ class Dec15New{
     }
 
 }
+class OldUsingRandom {
+    public static void main(String[] args) throws InterruptedException {
+        File file = new File("19/input15.txt");
+        long[] instructions;
+        IntcodeComputer computer;
+        int exitCode = 0;
+        String basestring;
+        HashMap<List<Integer>, Integer> tileValues = new HashMap<>();
+        int[] position = new int[]{21,21};
+        int[] newPosition = position.clone();
+        String[][] grid = new String[42][42];
+        for (String[] strings: grid){
+            Arrays.fill(strings, "?");
+        }
+        grid[position[0]][position[1]] = ".";
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            basestring = reader.readLine();
+            instructions = Arrays.stream(basestring.split(",")).mapToLong(Long::parseLong).toArray();
+            computer = new IntcodeComputer(instructions);
+            int command = getInput(grid, newPosition);
+            long output;
+            startWhile:
+            while (exitCode != 99){
+                computer.addInput(command);
+                exitCode = computer.run();
+                output = computer.getOutput();
+                switch ((int) output){
+                    case 0:
+                        grid[newPosition[0]][newPosition[1]] = "#";
+                        newPosition = Arrays.copyOf(position, position.length);
+                        break;
+                    case 1:
+                        position = Arrays.copyOf(newPosition, newPosition.length);
+                        break;
+                    case 2:
+                        position = Arrays.copyOf(newPosition, newPosition.length);
+                        System.out.println("Found oxygen system at: " + Arrays.toString(position));
+                        break startWhile;
+                }
+                grid[position[0]][position[1]] = ".";
+                command = getInput(grid, newPosition);
+                printGrid(grid, position);
+                Thread.sleep(100);
+//                System.out.println("Position: " + Arrays.toString(position));
+//                System.out.println("New position: " + Arrays.toString(newPosition));
+            }
+            grid[21][21] = "S";
+            printGrid(grid, position);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static int getInput(String[][] grid, int[] newPosition){
+        Random random = new Random();
+        int command = random.nextInt(4) + 1;
+        switch (command){
+            case 1:
+                newPosition[0]--;
+                break;
+            case 2:
+                newPosition[0]++;
+                break;
+            case 3:
+                newPosition[1]--;
+                break;
+            case 4:
+                newPosition[1]++;
+                break;
+        }
+        return command;
+    }
+    public static void printGrid(String[][] grid, int[] position){
+        for (int y = 0; y < grid.length; y++) {
+            String[] rows = grid[y];
+            for (int x = 0; x < rows.length; x++) {
+                if (y == position[0] && x == position[1]){
+                    System.out.print("D");
+                    continue;
+                }
+                System.out.print(rows[x]);
+            }
+            System.out.println();
+        }
+    }
+}
+/*
+Backtracking input
+x -= 1
+x ^= 1
+x += 1
+ */
