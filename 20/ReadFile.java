@@ -19,7 +19,7 @@ public class ReadFile {
         }
         return lines;
     }
-    public static List<Integer> convertToInteger (List<String> lines){
-        return lines.stream().map(Integer::parseInt).collect(Collectors.toList());
+    public static List<Long> convertToInteger (List<String> lines){
+        return lines.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 }
