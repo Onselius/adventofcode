@@ -5,6 +5,7 @@ public class De10 {
         Timer timer = new Timer();
         List<Long> inputLines = ReadFile.convertToInteger(ReadFile.getTextFromFile("20/input10.txt"));
         inputLines.add(0L);
+        inputLines.add(Collections.max(inputLines) + 3);
 
         int numberOf1 = 0;
         int numberOf3 = 0;
@@ -18,8 +19,6 @@ public class De10 {
                 numberOf3++;
             }
         }
-        numberOf1++;
-        numberOf3++;
 
         System.out.println("1: " + numberOf1);
         System.out.println("3: " + numberOf3);
@@ -37,13 +36,10 @@ public class De10 {
 
         long permutations = 1;
         Long value;
-        int count;
-        Long oldValue;
 
         for (int i = input.size() - 1; i > 0; i--){
             value = input.get(i);
             permutations = adapters.get(value);
-            //System.out.println("value: " + value);
             try {
                 if (input.contains(value - 1)){
                     adapters.put(value - 1, adapters.getOrDefault(value - 1, 0L) + permutations);
@@ -57,8 +53,6 @@ public class De10 {
             } catch (IndexOutOfBoundsException ignored){
 
             }
-
-            //System.out.println("perm: " + permutations);
         }
 
         return adapters.get(0L);
