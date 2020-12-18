@@ -5,7 +5,7 @@ public class De11 {
     public static void main(String[] args) {
         Timer timer = new Timer();
 
-        List<String> input = ReadFile.getTextFromFile("20/input11.txt");
+        List<String> input = ReadFile.getTextFromFile("20/input/input11.txt");
         int width = input.get(0).length();
         int height = input.size();
         Grid grid = new Grid(height, width);
