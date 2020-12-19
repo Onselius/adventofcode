@@ -12,7 +12,7 @@ public class De18 {
 
         long sum = 0L;
         for (String line: input){
-            sum += processLine(line, true);
+            sum += processLine(line, false);
         }
         System.out.println("Total part1: " + sum);
         timer.stopTime();
@@ -20,14 +20,14 @@ public class De18 {
 
         sum = 0L;
         for (String line: input){
-            sum += processLine(line, false);
+            sum += processLine(line, true);
         }
         System.out.println("Total part2: " + sum);
 
         timer.stopTime();
     }
 
-    private static long processLine(String line, boolean part1) {
+    private static long processLine(String line, boolean part2) {
         while (line.contains("(")){
             StringBuilder stringBuilder = new StringBuilder();
             int first = line.indexOf("(");
@@ -42,7 +42,7 @@ public class De18 {
                 }
                 if (count == 0){
                     substring = line.substring(first + 1, i);
-                    long value = processLine(substring, part1);
+                    long value = processLine(substring, part2);
                     stringBuilder.append(value);
                     stringBuilder.append(line.substring(i + 1));
                     line = stringBuilder.toString();
@@ -51,31 +51,36 @@ public class De18 {
             }
         }
         long value;
-        if (part1){
-            String[] splitted = line.split(" ");
-            value = Long.parseLong(splitted[0]);
-            for (int i = 1; i < splitted.length; i += 2){
-                value = calculateValue(value, Long.parseLong(splitted[i+1]), splitted[i]);
+        List<String> splitted = List.of(line.split(" "));
+        if (part2) {
+            splitted = calculatePart2(splitted);
+        }
+        value = calculateLeftToRight(splitted);
+        return value;
+    }
+
+    private static List<String> calculatePart2(List<String> listOfValues){
+        while (listOfValues.contains("+")) {
+            int i = listOfValues.indexOf("+");
+            List<String> newList = new ArrayList<>();
+            if (i > 1) {
+                newList.addAll(listOfValues.subList(0, i - 1));
             }
-        } else {
-            List<String> splitted = List.of(line.split(" "));
-            while (splitted.contains("+")){
-                int i = splitted.indexOf("+");
-                List<String> newList = new ArrayList<>();
-                if (i > 1){
-                    newList.addAll(splitted.subList(0, i-1));
-                }
-                long subValue = calculateValue(Long.parseLong(splitted.get(i-1)),Long.parseLong(splitted.get(i+1)), splitted.get(i));
-                newList.add(String.valueOf(subValue));
-                if (i+2 < splitted.size()){
-                    newList.addAll(splitted.subList(i+2, splitted.size()));
-                }
-                splitted = newList;
+            long subValue = calculateValue(Long.parseLong(listOfValues.get(i - 1)), Long.parseLong(listOfValues.get(i + 1)), listOfValues.get(i));
+            newList.add(String.valueOf(subValue));
+            if (i + 2 < listOfValues.size()) {
+                newList.addAll(listOfValues.subList(i + 2, listOfValues.size()));
             }
-            value = Long.parseLong(splitted.get(0));
-            for (int i = 1; i < splitted.size(); i += 2){
-                value = calculateValue(value, Long.parseLong(splitted.get(i+1)), splitted.get(i));
-            }
+            listOfValues = newList;
+        }
+
+        return listOfValues;
+    }
+
+    private static long calculateLeftToRight(List<String> listOfValues){
+        long value = Long.parseLong(listOfValues.get(0));
+        for (int i = 1; i < listOfValues.size(); i += 2){
+            value = calculateValue(value, Long.parseLong(listOfValues.get(i+1)), listOfValues.get(i));
         }
         return value;
     }
